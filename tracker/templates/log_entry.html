@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap4 %}
+
+{% block title %}Habit Log Entry {% endblock %}
+{% block content %}
+{{ form.media }}
+{% if user.is_authenticated %}
+<div class="card">
+    <h3 class="log-title text-center">
+        {{ log.habit.title }}
+    </h3>
+    <p class="start-end-date text-center font-weight-bold ">
+        Start date: {{ log.habit.start_date }} End date: {{ log.habit.end_date }}
+    </p>
+    <p class="log-date text-center font-weight-bold ">
+        Log date: {{ log.log_date }}
+    </p>
+    <p class="supporters text-center font-weight-normal ">Supporter(s): {% for supporter in log.habit.supporters.all %} {{ supporter }} {% endfor %}</p>
+    <p class="log-date text-center font-weight-normal ">
+        Action taken: {{ log.log_detail }}
+    </p>
+</div>
+<div class="card">
+    <h4 class="comment-title font-weight-normal">Comments</h4>
+    {% for comment in log.log_comments.all %}
+    <p class="comment-body-date">{{ comment.comment_date }} {{ comment.user }} {{ comment.comment_body }}</p>
+    {% endfor %}
+</div>
+
+<p>Add Comment</p>
+<form method="post">
+  {% csrf_token %}
+  {% bootstrap_form form %}
+  {% buttons %}
+      <button type="submit" class="btn btn-primary">Submit</button>
+  {% endbuttons %}
+</form>
+
+{% endif %}
+{% endblock %}
+
+
+

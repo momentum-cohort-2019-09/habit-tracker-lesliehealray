@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load bootstrap4 %}
+
+{% block title %}Log List{% endblock %}
+
+{% block content %}
+{{ form.media }}
+{% if user.is_authenticated %}
+<div class="container">
+  <p class="font-weight-bold text-center"> {{ habit.title }}</p>
+  <p class="card-title text-center font-weight-normal">Start date: {{ habit.start_date }} Total completed: {{ habit.total_completed }} </p>
+  <form method="post">
+      {% csrf_token %}
+      {% bootstrap_form form %}
+      {% buttons %}
+          <button type="submit" class="btn btn-primary">Submit</button>
+      {% endbuttons %}
+  </form>
+</div>
+<div class="row">
+  {% for log in habit.habit_log.all %}
+    {% if log.is_visible %}
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title text-center">{{ log.habit_log }}</h5>
+            <p class="card-text text-center">Number Completed: {{ log.log_number_completed }}</p>
+            <p class="card-text text-center">Date: {{ log.log_date }}</p>
+            <a href="{% url 'log_entry' habit.slug log.id %}" class="btn btn-outline-info log_edit ">View</a>
+            <a href="{% url 'log_edit' log.id %}" class="btn btn-outline-info log_edit float-right" data-toggle="modal" data-target="#modal" data-pk="{{ log.id }}" aria-pressed="false" autocomplete="off">Edit</a>
+          </div>
+          <div class="card-footer">
+            <p>
+              <small class="text-muted">Supporters: {% for supporter in habit.supporters.all %} {{ supporter }} {% endfor %}</small>        
+            </p>    
+          </div>
+        </div>
+      </div>
+  {% endif %}
+{% endfor %} 
+</div>
+                   
+{% else %}
+  <p>No entry</p>  
+{% endif %}
+<div class="modal" role="dialog" id="modal"></div>
+<script src="http://malsup.github.com/jquery.form.js"></script>
+<script>
+    $('#modal').on('show.bs.modal', function (e) {
+        var logId = $(e.relatedTarget).data('pk');
+        var modal = $(this)
+        $.ajax({
+            url: "/log_edit/" + logId,
+            context: document.body
+        }).done(function(response) {
+            modal.html(response);
+        });
+    })
+    $('#modal').on('click', '#close', function (e) {
+      $("#modal").modal('hide');
+    });
+   
+    </script>
+{% endblock %}

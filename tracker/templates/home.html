@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% load static %}
+
+{% if user.is_authenticated and user.profile_name %}
+<div class="font-weight-bold">
+  Welcome {{ user.profile_name }}
+</div>
+{% elif user.is_authenticated and user.username %}
+<div class="font-weight-bold">
+  Welcome {{ user.username}}
+</div>
+{% else %}
+<div class="login-signup text-center">
+  <a href="{% url 'login' %}" class="btn btn-outline-info">Login</a> |
+  <a href="{% url 'signup' %}" class="btn btn-outline-info">Create New Account</a>
+</div>
+{% endif %}
+{% if user.is_authenticated %}
+<div class="row">
+  {% for habit in habits %}
+    <div class="col-sm-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ habit.title }}</h5>
+          <p class="card-text text-center">Start Date: {{ habit.start_date }}</p>
+          <p class="card-text text-center">End Date: {{ habit.end_date }}</p>
+          <a href="{% url 'habit_detail' habit.slug  %}" class="btn btn-outline-info">View</a>
+          <a href="#" class="btn btn-outline-danger float-right">Delete</a>
+        </div>
+        <div class="card-footer">
+          <small class="text">Supporters: {% for supporter in habit.supporters.all %} {{ supporter }} {% endfor %}</small>        
+        </div> 
+      </div>
+    </div>  
+  {% endfor %} 
+</div>        
+{% else %}
+{% endif %}
+{% endblock %}
+
